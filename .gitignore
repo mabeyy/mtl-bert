@@ -1,0 +1,25 @@
+# Paper
+paper/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Data & model artifacts
+checkpoints/
+data/
+results/
+figures/
+samples/
+
+# Environment
+.env
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
