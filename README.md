@@ -4,37 +4,15 @@ A multi-task learning framework that leverages shared BERT representations acros
 
 ## Architecture
 
-```
-                         Input Text
-                             |
-                      [BERT Encoder] (shared)
-                             |
-                 +-----------+-----------+
-                 |           |           |
-           [Sarcasm]   [Harm/Intent]  [Emotion]
-            binary       binary       6-class
-              |             |            |
-              v             v            v
-           p(yes)       p(yes)     [sad, joy, love,
-            x0.20        x0.50      anger, fear, surprise]
-                                       x0.30
-                 \          |          /
-                  +----+----+----+----+
-                       |
-               Weighted Feature Vector z (8-dim)
-                       |
-                  [Dense Layer]
-                       |
-              p(cyberbullying)
-```
+![Architecture](figures/screenshots/architecture.png)
 
 ## Project Structure
 
 ```
 mtl-bert/
 ├── models/
-│   ├── mtl_bert_equal_weight_one_dataset.py          # MTL-BERT (equal weight, unified dataset)
-│   ├── mtl_bert_equal_weight_one_dataset_augmented.py # MTL-BERT + contextual MLM augmentation
+│   ├── mtl_bert.py                    # MTL-BERT (equal weight, unified dataset)
+│   ├── mtl_bert_augmented.py          # MTL-BERT + contextual MLM augmentation
 │   ├── stl_bert.py                                    # Single-task BERT baselines
 │   └── pipeline_baseline.py                           # Sequential pipeline baseline
 ├── utils/
@@ -81,10 +59,10 @@ Each training script supports multiple seed runs (42, 123, 456) and saves result
 
 ```bash
 # MTL-BERT (equal weight)
-python models/mtl_bert_equal_weight_one_dataset.py
+python models/mtl_bert.py
 
 # MTL-BERT with augmentation
-python models/mtl_bert_equal_weight_one_dataset_augmented.py
+python models/mtl_bert_augmented.py
 
 # Single-task baselines
 python models/stl_bert.py

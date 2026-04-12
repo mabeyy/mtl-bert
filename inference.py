@@ -2,7 +2,7 @@
 MTL-BERT Inference -- Weighted Late Fusion for Cyberbullying Detection
 (Unified Dataset variant: 6-class emotion)
 
-Loads a trained MTL-BERT model (from mtl_bert_equal_weight_one_dataset.py)
+Loads a trained MTL-BERT model (from mtl_bert.py)
 and performs inference using weighted late fusion:
 
   1. Shared BERT encoder produces contextual embeddings
