@@ -13,7 +13,6 @@ checkpoints/
 data/
 results/
 figures/
-samples/
 
 # Environment
 .env
