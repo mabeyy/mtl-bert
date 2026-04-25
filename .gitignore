@@ -12,9 +12,8 @@ build/
 checkpoints/
 data/
 results/
-figures/
+figures/*
 !figures/screenshots/
-!figures/screenshots/*.png
 
 # Environment
 .env
