@@ -38,10 +38,12 @@ TASK_CONFIGS = {
     "emotion": 6,
 }
 
+# Fusion weights: Config 2 (Equal) from ablation study (Section 4.5.1)
+# This configuration yielded the highest cyberbullying classification F1 (0.7139)
 INFERENCE_WEIGHTS = {
-    "sarc": 0.20,
-    "intent": 0.50,
-    "emotion": 0.30,
+    "sarc": 0.33,
+    "intent": 0.34,
+    "emotion": 0.33,
 }
 
 EMOTION_CLASSES = ["sadness", "joy", "love", "anger", "fear", "surprise"]
@@ -396,7 +398,7 @@ class CyberbullyingDetectorApp:
         sc_top.pack(fill=tk.X)
         tk.Label(sc_top, text="SARCASM", font=("Segoe UI", 8, "bold"),
                  bg=BG_SURFACE, fg=TEXT_FAINT).pack(side=tk.LEFT)
-        tk.Label(sc_top, text=f"w = 0.20", font=("Segoe UI", 8),
+        tk.Label(sc_top, text=f"w = 0.33", font=("Segoe UI", 8),
                  bg=BG_SURFACE, fg=TEXT_FAINT).pack(side=tk.RIGHT)
 
         sc_body = tk.Frame(sc, bg=BG_SURFACE)
@@ -417,7 +419,7 @@ class CyberbullyingDetectorApp:
         hc_top.pack(fill=tk.X)
         tk.Label(hc_top, text="HARMFUL INTENT", font=("Segoe UI", 8, "bold"),
                  bg=BG_SURFACE, fg=TEXT_FAINT).pack(side=tk.LEFT)
-        tk.Label(hc_top, text=f"w = 0.50", font=("Segoe UI", 8),
+        tk.Label(hc_top, text=f"w = 0.34", font=("Segoe UI", 8),
                  bg=BG_SURFACE, fg=TEXT_FAINT).pack(side=tk.RIGHT)
 
         hc_body = tk.Frame(hc, bg=BG_SURFACE)
@@ -440,7 +442,7 @@ class CyberbullyingDetectorApp:
         ec_top.pack(fill=tk.X)
         tk.Label(ec_top, text="EMOTIONAL TONE", font=("Segoe UI", 8, "bold"),
                  bg=BG_SURFACE, fg=TEXT_FAINT).pack(side=tk.LEFT)
-        tk.Label(ec_top, text=f"w = 0.30", font=("Segoe UI", 8),
+        tk.Label(ec_top, text=f"w = 0.33", font=("Segoe UI", 8),
                  bg=BG_SURFACE, fg=TEXT_FAINT).pack(side=tk.RIGHT)
 
         tk.Label(ec, text=EMOTION_CLASSES[top_idx].capitalize(),

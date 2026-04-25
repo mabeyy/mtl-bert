@@ -46,11 +46,12 @@ TASK_CONFIGS = {
     "emotion": 6,
 }
 
-# Domain-driven inference weights (Sec 3.2.6)
+# Fusion weights: Config 2 (Equal) from ablation study (Section 4.5.1)
+# This configuration yielded the highest cyberbullying classification F1 (0.7139)
 INFERENCE_WEIGHTS = {
-    "sarc": 0.20,
-    "intent": 0.50,
-    "emotion": 0.30,
+    "sarc": 0.33,
+    "intent": 0.34,
+    "emotion": 0.33,
 }
 
 EMOTION_CLASSES = ["sadness", "joy", "love", "anger", "fear", "surprise"]

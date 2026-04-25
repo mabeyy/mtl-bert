@@ -24,3 +24,4 @@ venv/
 # IDE
 .vscode/
 .idea/
+git log

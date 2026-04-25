@@ -20,6 +20,7 @@ mtl-bert/
 │   ├── visualize.py          # Publication-quality figure generation
 │   └── attention_viz.py      # Attention distribution visualization
 ├── inference.py              # Weighted late fusion inference
+├── ablation_fusion_weights.py  # Fusion-weight ablation study
 ├── prototype/
 │   └── app.py                # Tkinter GUI for live inference
 ├── data/
@@ -93,6 +94,24 @@ python inference.py --text "I hope he fails"
 | Harm/Intent | 0.50 | Primary indicator |
 | Emotion | 0.30 | Contextual signal |
 | Sarcasm | 0.20 | Modifier signal |
+
+## Fusion Weight Ablation
+
+Evaluates how different fusion weight configurations affect cyberbullying classification on the test set, across all 3 seeds. Task head probabilities are computed once per seed and reused across configs to keep runtime cheap.
+
+```bash
+python ablation_fusion_weights.py
+```
+
+| Config | w_harm | w_sarc | w_emotion | Rationale |
+|--------|:------:|:------:|:---------:|-----------|
+| F1-Proportional      | 0.40 | 0.37 | 0.24 | Weights ∝ each head's F1 (Table 4.3) |
+| Equal                | 0.34 | 0.33 | 0.33 | Neutral reference, no prioritization |
+| Harm-Dominant        | 0.60 | 0.20 | 0.20 | Harm is the most direct cyberbullying signal |
+| Emotion-Prioritized  | 0.50 | 0.20 | 0.30 | Tests whether affective context helps |
+| Sarcasm-Reduced      | 0.50 | 0.10 | 0.40 | Down-weights the weakest head, redistributes to harm/emotion |
+
+Per-seed and aggregated (mean ± std) accuracy, precision, recall, and F1 are written to `results/unified-dataset/fusion-weight-ablation/ablation_results.json`.
 
 ## Visualization
 

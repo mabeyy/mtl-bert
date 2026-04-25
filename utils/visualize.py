@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 # Config
 # ============================================================
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIGURES_DIR = os.path.join(BASE_DIR, "figures")
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -37,6 +37,7 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 # Result directories (unified dataset)
 BASELINE_DIR = os.path.join(RESULTS_DIR, "unified-dataset", "stl-bert")
 MTL_EQUAL_DIR = os.path.join(RESULTS_DIR, "unified-dataset", "mtl-equal-weight-one-dataset")
+MTL_AUGMENTED_DIR = os.path.join(RESULTS_DIR, "unified-dataset", "mtl-equal-weight-one-dataset-augmented")
 PIPELINE_DIR = os.path.join(RESULTS_DIR, "unified-dataset", "pipeline-baseline")
 
 DPI = 300
@@ -44,6 +45,7 @@ DPI = 300
 COLORS = {
     "baseline": "#F97316",       # orange
     "mtl_equal": "#2563EB",      # blue
+    "mtl_augmented": "#10B981",  # green
     "pipeline": "#8B5CF6",       # purple
     "sarc": "#8B5CF6",           # purple
     "intent": "#10B981",         # green
@@ -53,13 +55,14 @@ COLORS = {
 
 MODEL_LABELS = {
     "baseline": "STL-BERT",
-    "mtl_equal": "MTL (Equal)",
+    "mtl_equal": "MTL-BERT",
+    "mtl_augmented": "MTL-BERT (Augmented)",
     "pipeline": "Pipeline",
 }
 
 TASK_LABELS = {
     "sarc": "Sarcasm",
-    "intent": "Cyberbullying",
+    "intent": "Harm",
     "emotion": "Emotion",
 }
 
@@ -155,47 +158,32 @@ def plot_dataset_distribution():
 
     distributions = {}
 
-    sarc_path = os.path.join(DATA_DIR, "sarcasm", "sarcasm.csv")
-    if os.path.exists(sarc_path):
-        labels = []
-        with open(sarc_path, "r", encoding="utf-8", errors="replace") as f:
-            reader = csv.reader(f)
-            next(reader)
+    unified_path = os.path.join(DATA_DIR, "cyberbully_train_ready.csv")
+    if os.path.exists(unified_path):
+        sarc_labels = []
+        intent_labels = []
+        emotion_labels = []
+        with open(unified_path, "r", encoding="utf-8", errors="replace") as f:
+            reader = csv.DictReader(f)
             for row in reader:
-                if len(row) >= 3:
-                    try:
-                        labels.append(int(row[1]))
-                    except ValueError:
-                        continue
-        distributions["sarc"] = Counter(labels)
-
-    cyber_path = os.path.join(DATA_DIR, "cyberbullying", "cyberbullying.csv")
-    if os.path.exists(cyber_path):
-        labels = []
-        with open(cyber_path, "r", encoding="utf-8", errors="replace") as f:
-            reader = csv.reader(f)
-            next(reader)
-            for row in reader:
-                if len(row) >= 3:
-                    try:
-                        labels.append(int(row[1]))
-                    except ValueError:
-                        continue
-        distributions["intent"] = Counter(labels)
-
-    emo_path = os.path.join(DATA_DIR, "emotions", "emotions.csv")
-    if os.path.exists(emo_path):
-        labels = []
-        with open(emo_path, "r", encoding="utf-8", errors="replace") as f:
-            reader = csv.reader(f)
-            next(reader)
-            for row in reader:
-                if len(row) >= 2:
-                    try:
-                        labels.append(int(row[0]))
-                    except ValueError:
-                        continue
-        distributions["emotion"] = Counter(labels)
+                try:
+                    sarc_labels.append(int(row["sarcasm"]))
+                except (ValueError, KeyError):
+                    pass
+                try:
+                    intent_labels.append(int(row["harm"]))
+                except (ValueError, KeyError):
+                    pass
+                try:
+                    emotion_labels.append(row["emotion"])
+                except KeyError:
+                    pass
+        if sarc_labels:
+            distributions["sarc"] = Counter(sarc_labels)
+        if intent_labels:
+            distributions["intent"] = Counter(intent_labels)
+        if emotion_labels:
+            distributions["emotion"] = Counter(emotion_labels)
 
     if not distributions:
         print("  Skipped: no CSV data found.")
@@ -203,8 +191,11 @@ def plot_dataset_distribution():
 
     class_labels = {
         "sarc": {0: "Non-sarcastic", 1: "Sarcastic"},
-        "intent": {0: "Not Bullying", 1: "Bullying"},
-        "emotion": {0: "Sad", 1: "Joy", 2: "Love", 3: "Angry", 4: "Fear", 5: "Surprise"},
+        "intent": {0: "Not Harmful", 1: "Harmful"},
+        "emotion": {
+            "sadness": "Sadness", "joy": "Joy", "love": "Love",
+            "anger": "Anger", "fear": "Fear", "surprise": "Surprise",
+        },
     }
 
     task_colors = {
@@ -216,7 +207,10 @@ def plot_dataset_distribution():
     fig, axes = plt.subplots(1, 3, figsize=(14, 4.5))
 
     for ax, (task, dist) in zip(axes, distributions.items()):
-        sorted_keys = sorted(dist.keys())
+        if task == "emotion":
+            sorted_keys = [k for k in EMOTION_CLASSES if k in dist]
+        else:
+            sorted_keys = sorted(dist.keys())
         names = [class_labels[task][k] for k in sorted_keys]
         counts = [dist[k] for k in sorted_keys]
         colors = task_colors[task][:len(sorted_keys)]
@@ -245,10 +239,11 @@ def plot_dataset_distribution():
 # ============================================================
 
 def plot_model_comparison():
-    print("\n[2/8] Three-Model Comparison...")
+    print("\n[2/8] Model Comparison...")
 
     baseline, baseline_std = load_metrics(BASELINE_DIR)
     mtl_eq, mtl_eq_std = load_metrics(MTL_EQUAL_DIR)
+    mtl_aug, mtl_aug_std = load_metrics(MTL_AUGMENTED_DIR)
 
     models = {}
     model_stds = {}
@@ -258,16 +253,19 @@ def plot_model_comparison():
     if mtl_eq:
         models["mtl_equal"] = mtl_eq
         model_stds["mtl_equal"] = mtl_eq_std
+    if mtl_aug:
+        models["mtl_augmented"] = mtl_aug
+        model_stds["mtl_augmented"] = mtl_aug_std
 
     if len(models) < 2:
         print("  Skipped: need at least 2 models with metrics.")
         return
 
     tasks = ["sarc", "intent", "emotion"]
-    metrics_to_plot = ["accuracy", "f1"]
-    metric_labels = {"accuracy": "Accuracy", "f1": "F1 Score"}
+    metrics_to_plot = ["accuracy", "precision", "recall"]
+    metric_labels = {"accuracy": "Accuracy", "precision": "Precision", "recall": "Recall"}
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5))
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5.5))
 
     for ax, metric in zip(axes, metrics_to_plot):
         x = np.arange(len(tasks))
@@ -300,11 +298,11 @@ def plot_model_comparison():
         ax.set_xticks(x)
         ax.set_xticklabels([TASK_LABELS[t] for t in tasks])
         ax.set_ylim(0, 1.1)
-        ax.legend(loc="lower right")
+        ax.legend(loc="lower right", fontsize=8)
         ax.grid(axis="y", alpha=0.2)
 
     fig.suptitle(
-        "Model Comparison: STL-BERT vs MTL (Equal) vs MTL (Weighted)",
+        "Model Comparison: STL-BERT vs MTL-BERT vs MTL-BERT (Augmented)",
         fontweight="bold", fontsize=13, y=1.02,
     )
     fig.tight_layout()
@@ -738,6 +736,7 @@ def main():
     # Show what data is available
     for label, path in [("STL Baseline", BASELINE_DIR),
                         ("MTL Equal", MTL_EQUAL_DIR),
+                        ("MTL Augmented", MTL_AUGMENTED_DIR),
                         ("Pipeline", PIPELINE_DIR)]:
         has_agg = os.path.exists(os.path.join(path, "aggregated_results.json"))
         has_prog = os.path.exists(os.path.join(path, "training_progress.json"))
