@@ -3,10 +3,10 @@ Thesis Visualization Script
 
 Generates all publication-quality figures from training results.
 Reads from:
-  - results/stl-bert/           (Single-Task BERT)
-  - results/mtl-equal-weight/   (MTL BERT, equal weights)
-  - results/mtl-bert/           (MTL BERT, inverse-sqrt weighting)
-  - results/pipeline-baseline/  (Pipeline baseline)
+  - results/unified-dataset/stl-bert/                              (Single-Task BERT)
+  - results/unified-dataset/mtl-equal-weight-one-dataset/          (MTL-BERT, equal weights)
+  - results/unified-dataset/mtl-equal-weight-one-dataset-augmented/ (MTL-BERT + MLM augmentation)
+  - results/unified-dataset/pipeline-baseline/                     (Pipeline baseline)
 
 Figures saved to figures/ at 300 DPI.
 

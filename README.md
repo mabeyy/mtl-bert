@@ -24,7 +24,12 @@ mtl-bert/
 ├── prototype/
 │   └── app.py                # Tkinter GUI for live inference
 ├── data/
-│   └── cyberbully_train_ready.csv   # Unified multi-label dataset
+│   ├── cyberbully_train_ready.csv   # Unified multi-label dataset (training-ready)
+│   ├── clean_for_training.py        # Raw → unified preprocessing script
+│   ├── Cyberbully_corrected_emotion_sentiment.xlsx - cyberbully.csv  # Raw source
+│   ├── cyberbullying/               # Raw per-task dataset
+│   ├── emotions/                    # Raw per-task dataset
+│   └── sarcasm/                     # Raw per-task dataset
 ├── results/                  # Training results & metrics
 ├── figures/                  # Generated plots
 ├── Colab/                    # Colab notebook experiments
