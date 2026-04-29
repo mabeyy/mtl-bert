@@ -149,6 +149,8 @@ The GUI displays:
 
 ## Dataset
 
+Source: [Google Sheets dataset](https://docs.google.com/spreadsheets/d/1tD5yqGZ3TlDjeUFThautfZGegHrRz7FW/edit?gid=1650123160#gid=1650123160)
+
 The unified dataset (`data/cyberbully_train_ready.csv`) contains multi-label annotations with the following columns:
 
 | Column | Type | Values |
